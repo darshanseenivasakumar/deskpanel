@@ -1,0 +1,194 @@
+/* ---------- tokens: Windows app theme. Rust pushes it as data-theme the instant Windows broadcasts
+   the change (~0 ms); prefers-color-scheme (Chromium notices ~0.4 s later) is only the fallback. */
+:root {
+  color-scheme: light dark;
+  --font: "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  --radius: 24px;
+  --tile-radius: 16px;
+
+  /* light */
+  --tint: rgba(246, 246, 248, 0.58);
+  --hairline: rgba(0, 0, 0, 0.10);
+  --highlight: rgba(255, 255, 255, 0.65);
+  --tile: rgba(255, 255, 255, 0.52);
+  --tile-hover: rgba(255, 255, 255, 0.70);
+  --text: #111114;
+  --text-2: rgba(17, 17, 20, 0.58);
+  --icon-off: rgba(0, 0, 0, 0.10);
+  --accent: #0a84ff;
+  --on-accent: #fff;
+  --track: rgba(0, 0, 0, 0.10);
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.22), 0 1px 3px rgba(0, 0, 0, 0.12); /* reach <= 36px < 40px margin */
+}
+:root[data-theme="dark"] {
+  --tint: rgba(28, 28, 32, 0.52);
+  --hairline: rgba(255, 255, 255, 0.14);
+  --highlight: rgba(255, 255, 255, 0.10);
+  --tile: rgba(255, 255, 255, 0.10);
+  --tile-hover: rgba(255, 255, 255, 0.16);
+  --text: #f5f5f7;
+  --text-2: rgba(245, 245, 247, 0.58);
+  --icon-off: rgba(255, 255, 255, 0.14);
+  --track: rgba(255, 255, 255, 0.16);
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.42), 0 1px 3px rgba(0, 0, 0, 0.30);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --tint: rgba(28, 28, 32, 0.52);
+    --hairline: rgba(255, 255, 255, 0.14);
+    --highlight: rgba(255, 255, 255, 0.10);
+    --tile: rgba(255, 255, 255, 0.10);
+    --tile-hover: rgba(255, 255, 255, 0.16);
+    --text: #f5f5f7;
+    --text-2: rgba(245, 245, 247, 0.58);
+    --icon-off: rgba(255, 255, 255, 0.14);
+    --track: rgba(255, 255, 255, 0.16);
+    --shadow: 0 8px 28px rgba(0, 0, 0, 0.42), 0 1px 3px rgba(0, 0, 0, 0.30);
+  }
+}
+
+/* ---------- window ---------- */
+html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+body { font: 13px/1.25 var(--font); color: var(--text); -webkit-font-smoothing: antialiased; user-select: none; cursor: default; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: default; }
+svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* The window is 40px larger on every side: transparent room for the shadow, so it is never clipped. */
+.panel {
+  position: absolute; inset: 40px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  isolation: isolate;
+  transform-origin: 100% 50%;
+  will-change: transform, opacity;
+  opacity: 0; /* invisible until the first appear/pop animation: no first-frame flash */
+  transition: box-shadow .25s;
+}
+.panel.lifted { box-shadow: 0 12px 28px rgba(0, 0, 0, 0.50), 0 2px 8px rgba(0, 0, 0, 0.25); } /* reach 40px */
+.glass { position: absolute; inset: 0; background-repeat: no-repeat; z-index: -2; }
+
+/* Desktop mode: the window is region-clipped to the panel + a 4px ring (see desktop::set_region).
+   The ring shows the real, unblurred wallpaper so the panel's anti-aliased corners blend into
+   true wallpaper pixels. The shadow would be cut by the region, so it is off on the desktop. */
+.backdrop { position: absolute; inset: 36px; border-radius: 28px; background-repeat: no-repeat; }
+/* Popped over apps: blurred snapshot of what is behind, cross-faded over the wallpaper glass. */
+.glass.snap { opacity: 0; transition: opacity .18s ease-out; }
+body.popped.has-snap .glass.snap { opacity: 1; }
+body.dragging, body.dragging * { cursor: grabbing !important; }
+body.popped .backdrop { display: none; }
+body:not(.popped) .panel, body:not(.popped) .panel.lifted { box-shadow: none; }
+.tint { position: absolute; inset: 0; background: var(--tint); z-index: -1; }
+.panel::after { /* hairline + top highlight, drawn above content edges */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--hairline), inset 0 1px 0 var(--highlight);
+}
+
+.close {
+  position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--tile); color: var(--text-2);
+  opacity: 0; transition: opacity .15s; z-index: 2;
+}
+.close svg { width: 10px; height: 10px; stroke-width: 1.8; }
+.panel:hover .close { opacity: 1; }
+.close:hover { background: var(--tile-hover); color: var(--text); }
+
+/* ---------- grid ---------- */
+.grid {
+  display: grid; gap: 10px; padding: 14px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "conn  theme"
+    "conn  power"
+    "media media"
+    "disp  disp"
+    "snd   snd"
+    "timer sw"
+    "stats stats";
+}
+.tile { background: var(--tile); border-radius: var(--tile-radius); padding: 10px; transition: background .15s; }
+.tile b { font-weight: 600; }
+.tile small, .stats small { color: var(--text-2); font-size: 11px; }
+.label { display: flex; flex-direction: column; min-width: 0; }
+.label small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.round {
+  width: 30px; height: 30px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  background: var(--icon-off); transition: background .2s, color .2s;
+}
+.round svg { width: 16px; height: 16px; }
+[data-on="true"] .round { background: var(--accent); color: var(--on-accent); }
+
+.conn { grid-area: conn; display: flex; flex-direction: column; justify-content: space-around; gap: 6px; }
+.row-toggle { display: flex; align-items: center; gap: 10px; text-align: left; }
+.small { display: flex; align-items: center; gap: 10px; }
+#theme-tile { grid-area: theme; } #power-tile { grid-area: power; }
+
+.media { grid-area: media; display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; }
+.art { width: 56px; height: 56px; border-radius: 10px; background: var(--icon-off) center/cover; }
+.meta { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.meta b, .meta small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar { height: 4px; border-radius: 2px; background: var(--track); margin-top: 6px; overflow: hidden; }
+.bar .fill { height: 100%; width: 0%; background: var(--text-2); }
+.controls { display: flex; gap: 2px; }
+.controls button { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; }
+.controls button:hover { background: var(--tile-hover); }
+.controls svg { width: 16px; height: 16px; fill: currentColor; stroke: none; }
+.controls .big svg { width: 20px; height: 20px; }
+
+.slider-tile { display: flex; flex-direction: column; gap: 6px; }
+.slider-tile:nth-of-type(5) { grid-area: disp; } .slider-tile:nth-of-type(6) { grid-area: snd; }
+.slider {
+  --v: .5; position: relative; height: 26px; border-radius: 13px; background: var(--track); overflow: hidden;
+}
+.slider::before { content: ""; position: absolute; inset: 0 auto 0 0; width: calc(var(--v) * 100%); min-width: 26px; background: var(--text); opacity: .9; border-radius: 13px; }
+.knob-ico { position: absolute; left: 6px; top: 5px; width: 16px; height: 16px; color: var(--tint); mix-blend-mode: normal; }
+:root[data-theme="dark"] .knob-ico { color: #1c1c20; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .knob-ico { color: #1c1c20; } }
+.knob-ico svg { width: 16px; height: 16px; }
+
+.timer { grid-area: timer; display: flex; align-items: center; gap: 10px; }
+.ring { width: 44px; height: 44px; transform: rotate(-90deg); }
+.ring .track { stroke: var(--track); stroke-width: 4; }
+.ring .prog { stroke: #ff9f0a; stroke-width: 4; stroke-dasharray: 119.4; stroke-dashoffset: 30; }
+.digits { display: block; font: 600 20px/1.1 "Segoe UI Variable Display", var(--font); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.stopwatch { grid-area: sw; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+
+/* ---------- interaction ---------- */
+.tile.small, .row-toggle, .ring-btn, .chips button, .mini, .slider { cursor: pointer; }
+.tile.small:hover, .conn:hover { background: var(--tile-hover); }
+.tile.small:active, .row-toggle:active .round, .chips button:active { transform: scale(0.96); }
+.tile.small, .row-toggle .round { transition: background .15s, transform .12s; }
+[data-unavailable="true"] { opacity: .45; pointer-events: none; }
+
+.ring-btn { position: relative; width: 44px; height: 44px; flex: none; }
+.ring-btn .ring { position: absolute; inset: 0; }
+.ring-ico { position: absolute; inset: 12px; width: 20px; height: 20px; fill: currentColor; stroke: none; }
+.ring .prog { transition: stroke-dashoffset .25s linear; }
+.tcol { display: flex; flex-direction: column; min-width: 0; }
+.tcol small { display: flex; justify-content: space-between; align-items: center; }
+.mini { font-size: 10px; color: var(--text-2); padding: 0 4px; border-radius: 6px; visibility: hidden; }
+.mini:hover { background: var(--tile-hover); color: var(--text); }
+.timer[data-state="running"] .mini, .timer[data-state="paused"] .mini { visibility: visible; }
+.chips { display: flex; gap: 4px; margin-top: 4px; }
+.chips button { font-size: 11px; padding: 2px 7px; border-radius: 8px; background: var(--icon-off); transition: background .15s, transform .12s; }
+.chips button:hover { background: var(--tile-hover); }
+.timer:not([data-state="idle"]) #timer-chips { visibility: hidden; }
+#sw-laps { font-variant-numeric: tabular-nums; }
+
+.slider { touch-action: none; }
+.slider.dragging::before { transition: none; }
+.slider::before { transition: width .12s ease-out; }
+.knob-ico { cursor: pointer; z-index: 1; }
+.slider[data-muted="true"]::before { opacity: .35; }
+
+.err {
+  position: absolute; left: 14px; right: 14px; bottom: 10px; padding: 6px 10px; border-radius: 10px;
+  background: rgba(255, 69, 58, .92); color: #fff; font-size: 11px; opacity: 0; transform: translateY(6px);
+  transition: opacity .2s, transform .2s; pointer-events: none;
+}
+.err.show { opacity: 1; transform: none; }
+
+.stats { grid-area: stats; display: flex; justify-content: space-between; padding: 2px 4px; }
+.stats span { display: flex; flex-direction: column; align-items: center; }
+.stats b { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 12px; }

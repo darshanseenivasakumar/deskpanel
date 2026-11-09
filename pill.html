@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DeskPanel Pill</title>
+  <link rel="stylesheet" href="/src/styles/pill.css" />
+</head>
+<body>
+  <div id="pill" class="pill" data-mode="none">
+    <div class="lead">
+      <div id="p-art" class="p-art"></div>
+      <svg id="p-ring" class="p-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" class="track" /><circle cx="12" cy="12" r="10" class="prog" id="p-ring-prog" /></svg>
+    </div>
+    <div class="mid">
+      <b id="p-title">—</b>
+      <small id="p-sub"></small>
+    </div>
+    <div class="trail">
+      <span class="eq" id="p-eq"><i></i><i></i><i></i><i></i></span>
+      <b id="p-time" class="digits"></b>
+    </div>
+    <div class="ctrls">
+      <button id="p-b1" aria-label="Previous / reset"><svg viewBox="0 0 24 24"><path id="p-b1-ico" d="M19 6v12l-8-6zM11 6v12L3 12z" /></svg></button>
+      <button id="p-b2" class="big" aria-label="Play / pause"><svg viewBox="0 0 24 24"><path id="p-b2-ico" d="M8 5v14l11-7z" /></svg></button>
+      <button id="p-b3" aria-label="Next / lap"><svg viewBox="0 0 24 24"><path id="p-b3-ico" d="M5 6v12l8-6zM13 6v12l8-6z" /></svg></button>
+    </div>
+  </div>
+  <script type="module" src="/src/pill/main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+[workspace]
+resolver = "2"
+members = ["crates/core", "crates/probe", "src-tauri"]
+exclude = ["spike"]
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+# Image decode/blur is ~20x slower unoptimised; keep dev builds usable.
+[profile.dev.package.image]
+opt-level = 3
+[profile.dev.package.zune-jpeg]
+opt-level = 3
+[profile.dev.package.png]
+opt-level = 3
+

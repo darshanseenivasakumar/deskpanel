@@ -1,0 +1,7 @@
+[package]
+name = "deskpanel-core"
+version = "0.1.0"
+edition = "2021"
+description = "Pure, Win32-free logic for DeskPanel: the show/hide state machine."
+
+[dependencies]

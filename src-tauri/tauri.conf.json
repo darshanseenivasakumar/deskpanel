@@ -1,0 +1,54 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "DeskPanel",
+  "version": "0.1.0",
+  "identifier": "dev.darshan.deskpanel",
+  "build": {
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "security": { "csp": null },
+    "windows": [
+      {
+        "label": "main",
+        "title": "DeskPanel",
+        "url": "index.html",
+        "width": 460,
+        "height": 600,
+        "transparent": true,
+        "decorations": false,
+        "skipTaskbar": true,
+        "shadow": false,
+        "resizable": false,
+        "visible": false,
+        "focus": false,
+        "focusable": false
+      },
+      {
+        "label": "pill",
+        "title": "DeskPanel Pill",
+        "url": "pill.html",
+        "width": 420,
+        "height": 130,
+        "transparent": true,
+        "decorations": false,
+        "skipTaskbar": true,
+        "shadow": false,
+        "resizable": false,
+        "alwaysOnTop": true,
+        "visible": false,
+        "focus": false,
+        "focusable": false
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/icon.ico"],
+    "windows": { "nsis": { "installMode": "currentUser", "installerHooks": "windows/hooks.nsh" } }
+  }
+}

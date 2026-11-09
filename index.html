@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DeskPanel</title>
+  <link rel="stylesheet" href="/src/styles/panel.css" />
+</head>
+<body>
+  <div id="backdrop" class="backdrop"></div>
+  <main id="panel" class="panel" data-state="idle">
+    <div id="glass" class="glass"></div>
+    <div id="glass-snap" class="glass snap"></div>
+    <div class="tint"></div>
+    <button id="close" class="close" title="Hide (bring back with Win+Alt+Space or the tray)" aria-label="Hide panel">
+      <svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" /></svg>
+    </button>
+
+    <div class="grid">
+      <!-- Connectivity -->
+      <section class="tile conn">
+        <button class="row-toggle" id="wifi" data-on="true">
+          <span class="round"><svg viewBox="0 0 24 24"><path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0" /><circle cx="12" cy="19" r="1.2" /></svg></span>
+          <span class="label"><b>Wi-Fi</b><small id="wifi-sub">—</small></span>
+        </button>
+        <button class="row-toggle" id="bt" data-on="false">
+          <span class="round"><svg viewBox="0 0 24 24"><path d="M7 7l10 10-5 5V2l5 5L7 17" /></svg></span>
+          <span class="label"><b>Bluetooth</b><small id="bt-sub">—</small></span>
+        </button>
+      </section>
+      <section class="tile small" id="theme-tile">
+        <span class="round"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" /></svg></span>
+        <span class="label"><b>Dark Mode</b><small id="theme-sub">—</small></span>
+      </section>
+      <section class="tile small" id="power-tile">
+        <span class="round"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z" /></svg></span>
+        <span class="label"><b>Power</b><small id="power-sub">—</small></span>
+      </section>
+
+      <!-- Now playing -->
+      <section class="tile media">
+        <div class="art" id="art"></div>
+        <div class="meta"><b id="track">Not playing</b><small id="artist">—</small>
+          <div class="bar"><div class="fill" id="progress"></div></div>
+        </div>
+        <div class="controls">
+          <button aria-label="Previous" id="m-prev"><svg viewBox="0 0 24 24"><path d="M19 6v12l-8-6zM11 6v12L3 12z" /></svg></button>
+          <button aria-label="Play/Pause" class="big" id="m-play"><svg viewBox="0 0 24 24"><path id="m-play-ico" d="M8 5v14l11-7z" /></svg></button>
+          <button aria-label="Next" id="m-next"><svg viewBox="0 0 24 24"><path d="M5 6v12l8-6zM13 6v12l8-6z" /></svg></button>
+        </div>
+      </section>
+
+      <!-- Sliders -->
+      <section class="tile slider-tile">
+        <small>Display</small>
+        <div class="slider" id="brightness" style="--v: .4"><span class="knob-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5" /></svg></span></div>
+      </section>
+      <section class="tile slider-tile">
+        <small>Sound</small>
+        <div class="slider" id="volume" style="--v: .5"><span class="knob-ico"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" /><path d="M16 9a4 4 0 0 1 0 6" /></svg></span></div>
+      </section>
+
+      <!-- Timer / stopwatch -->
+      <section class="tile timer" id="timer-tile" data-state="idle">
+        <button class="ring-btn" id="timer-toggle" aria-label="Start / pause timer">
+          <svg class="ring" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" class="track" /><circle cx="22" cy="22" r="19" class="prog" id="timer-ring" /></svg>
+          <svg class="ring-ico" viewBox="0 0 24 24"><path id="timer-ico" d="M8 5v14l11-7z" /></svg>
+        </button>
+        <div class="tcol">
+          <small>Timer <button class="mini" id="timer-reset" title="Reset">Reset</button></small>
+          <b class="digits" id="timer-digits" title="Scroll to change minutes">25:00</b>
+          <div class="chips" id="timer-chips">
+            <button data-min="5">5m</button><button data-min="10">10m</button><button data-min="25">25m</button>
+          </div>
+        </div>
+      </section>
+      <section class="tile stopwatch" id="sw-tile">
+        <small>Stopwatch <span id="sw-laps"></span></small>
+        <b class="digits" id="sw-digits">00:00.0</b>
+        <div class="chips">
+          <button id="sw-toggle">Start</button><button id="sw-second">Lap</button>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="stats">
+        <span><small>CPU</small><b id="s-cpu">—</b></span>
+        <span><small>RAM</small><b id="s-ram">—</b></span>
+        <span><small>GPU</small><b id="s-gpu">—</b></span>
+        <span><small>NET</small><b id="s-net">—</b></span>
+        <span><small>BAT</small><b id="s-bat">—</b></span>
+      </section>
+    </div>
+    <div class="err" id="err" role="status"></div>
+  </main>
+  <script type="module" src="/src/panel/main.ts"></script>
+</body>
+</html>
