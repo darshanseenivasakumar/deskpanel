@@ -56,7 +56,7 @@ DeskPanel turns that around. **It is part of the desktop layer**, like a wallpap
 
 **Requirements:** Windows 11 (built and tested on build 26300). WebView2 is already part of Windows 11.
 
-1. Download **`DeskPanel_x64-setup.exe`** from the [latest release](../../releases/latest).
+1. Download **`DeskPanel_0.1.0_x64-setup.exe`** from the [latest release](../../releases/latest).
 2. Run it. It installs for your user only, so there is no admin prompt.
 3. Windows SmartScreen may say *"Windows protected your PC"*, because the installer isn't code-signed. Click **More info → Run anyway**. You can check it first: the code is all here, and the build is reproducible from this repo.
 4. DeskPanel appears on the right side of your desktop. It starts with Windows from then on (turn that off in the tray menu).
